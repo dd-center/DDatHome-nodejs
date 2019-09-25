@@ -17,7 +17,7 @@ const parse = string => {
 
 const url = process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe'
 const PARALLEL = 8
-const INTERVAL = 320
+const INTERVAL = 340
 
 if (process.env.development) {
   console.log('Development Environment Detected')
