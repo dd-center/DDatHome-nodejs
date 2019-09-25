@@ -1,2 +1,2 @@
 # DDatHome nodejs
- DD@Home.js
+ DD@Home
