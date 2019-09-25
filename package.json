@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "got": "^9.6.0",
     "ws": "^7.1.2"
