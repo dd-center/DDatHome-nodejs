@@ -15,7 +15,7 @@ const parse = string => {
   }
 }
 
-const url = process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe'
+const url = process.env.url || process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe'
 const PARALLEL = 8
 const INTERVAL = 340
 
