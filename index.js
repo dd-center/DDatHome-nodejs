@@ -1,3 +1,4 @@
+const { URL } = require('url') // Compatibility
 const WebSocket = require('ws')
 const got = require('got')
 
@@ -15,9 +16,20 @@ const parse = string => {
   }
 }
 
-const url = process.env.url || process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe'
+const url = new URL(process.env.url || process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe')
+
+const VERSION = '1.0.0'
+
 const PARALLEL = 8
 const INTERVAL = 340
+
+url.searchParams.set('runtime', `node${process.version}`)
+url.searchParams.set('version', VERSION)
+url.searchParams.set('platform', process.platform)
+
+if (process.env.name) {
+  url.searchParams.set('name', process.env.name)
+}
 
 if (process.env.development) {
   console.log('Development Environment Detected')
@@ -32,7 +44,7 @@ const connect = () => {
     const json = parse(message)
     if (json) {
       const { key, url } = json
-      console.log('job receive')
+      console.log('job received')
       setTimeout(() => ws.send('DDhttp'), INTERVAL * PARALLEL)
       const time = Date.now()
       const { body } = await got(url, { json: true }).catch(() => ({}))
