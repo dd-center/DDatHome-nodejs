@@ -21,7 +21,7 @@ const url = new URL(process.env.url || process.env.development ? 'ws://0.0.0.0:9
 const VERSION = '1.0.0'
 
 const PARALLEL = 8
-const INTERVAL = 340
+const INTERVAL = Number.isNaN(Number(process.env.interval)) ? 480 : Number(process.env.interval)
 
 if (!process.env.hide) {
   url.searchParams.set('runtime', `node${process.version}`)
@@ -36,6 +36,10 @@ if (process.env.name) {
 if (process.env.development) {
   console.log('Development Environment Detected')
 }
+
+console.log({
+  INTERVAL
+})
 
 console.log(`using: ${url}`)
 
