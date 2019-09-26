@@ -23,9 +23,11 @@ const VERSION = '1.0.0'
 const PARALLEL = 8
 const INTERVAL = 340
 
-url.searchParams.set('runtime', `node${process.version}`)
-url.searchParams.set('version', VERSION)
-url.searchParams.set('platform', process.platform)
+if (!process.env.hide) {
+  url.searchParams.set('runtime', `node${process.version}`)
+  url.searchParams.set('version', VERSION)
+  url.searchParams.set('platform', process.platform)
+}
 
 if (process.env.name) {
   url.searchParams.set('name', process.env.name)
