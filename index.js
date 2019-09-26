@@ -27,6 +27,9 @@ if (!process.env.hide) {
   url.searchParams.set('runtime', `node${process.version}`)
   url.searchParams.set('version', VERSION)
   url.searchParams.set('platform', process.platform)
+  if (process.env.docker) {
+    url.searchParams.set('docker', 'docker')
+  }
 }
 
 if (process.env.name) {
