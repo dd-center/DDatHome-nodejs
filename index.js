@@ -18,7 +18,7 @@ const parse = string => {
 
 const url = new URL(process.env.url || process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe')
 
-const VERSION = '1.0.0'
+const VERSION = '1.0.1'
 
 const PARALLEL = 8
 const INTERVAL = Number.isNaN(Number(process.env.interval)) ? 480 : Number(process.env.interval)
@@ -46,7 +46,7 @@ console.log({
 
 console.log(`using: ${url}`)
 
-const connect = () => {
+const connect = () => new Promise(resolve => {
   const ws = new WebSocket(url)
 
   ws.on('message', async message => {
@@ -67,7 +67,6 @@ const connect = () => {
 
   ws.on('open', () => {
     console.log('DD@Home connected')
-    ws.send('DDhttp')
     Array(PARALLEL).fill().map(() => ws.send('DDhttp'))
   })
 
@@ -77,8 +76,14 @@ const connect = () => {
 
   ws.on('close', n => {
     console.log(`closed ${n}`)
-    setTimeout(connect, 1000)
+    setTimeout(resolve, 1000)
   })
-}
+})
 
-connect()
+;
+
+(async () => {
+  while (true) {
+    await connect()
+  }
+})()
