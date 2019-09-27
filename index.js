@@ -36,6 +36,15 @@ if (process.env.name) {
   url.searchParams.set('name', process.env.name)
 }
 
+const verbose = process.env.development || process.env.verbose
+const log = verbose ? console.log : () => {}
+
+if (verbose) {
+  console.log('verbose log is on')
+} else {
+  console.log('verbose log is off')
+}
+
 if (process.env.development) {
   console.log('Development Environment Detected')
 }
@@ -53,11 +62,11 @@ const connect = () => new Promise(resolve => {
     const json = parse(message)
     if (json) {
       const { key, url } = json
-      console.log('job received')
+      log('job received', url)
       setTimeout(() => ws.send('DDhttp'), INTERVAL * PARALLEL)
       const time = Date.now()
       const { body } = await got(url, { json: true }).catch(() => ({}))
-      console.log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`)
+      log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`)
       ws.send(JSON.stringify({
         key,
         data: body
