@@ -32,8 +32,8 @@ if (!process.env.hide) {
   }
 }
 
-if (process.env.name) {
-  url.searchParams.set('name', process.env.name)
+if (process.env.nickname) {
+  url.searchParams.set('name', process.env.nickname)
 }
 
 const verbose = process.env.development || process.env.verbose
