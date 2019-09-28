@@ -61,16 +61,17 @@ const connect = () => new Promise(resolve => {
   ws.on('message', async message => {
     const json = parse(message)
     if (json) {
+      const now = Date.now()
       const { key, url } = json
       log('job received', url)
-      setTimeout(() => ws.send('DDhttp'), INTERVAL * PARALLEL)
       const time = Date.now()
-      const { body } = await got(url, { json: true }).catch(() => ({}))
+      const { body } = await got(url, { json: true }).catch(e => ({ body: { code: e.statusCode } }))
       log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`)
       ws.send(JSON.stringify({
         key,
         data: body
       }))
+      setTimeout(() => ws.send('DDhttp'), INTERVAL * PARALLEL - Date.now() + now)
     }
   })
 
