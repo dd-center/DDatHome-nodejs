@@ -65,7 +65,7 @@ const connect = () => new Promise(resolve => {
       const { key, url } = json
       log('job received', url)
       const time = Date.now()
-      const { body } = await got(url, { json: true }).catch(e => ({ body: { code: e.statusCode } }))
+      const { body } = await got(url).catch(e => ({ body: { code: e.statusCode } }))
       log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`)
       ws.send(JSON.stringify({
         key,
