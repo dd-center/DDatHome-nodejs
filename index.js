@@ -2,6 +2,13 @@ const { URL } = require('url') // Compatibility
 const WebSocket = require('ws')
 const got = require('got')
 
+console.log(`
+${Array(process.stdout.columns).fill('D').join('')}
+Thank you for participating DD@Home,
+Please read README.md for more information.
+${Array(process.stdout.columns).fill('D').join('')}
+`)
+
 const parse = string => {
   try {
     const json = JSON.parse(string)
@@ -18,7 +25,7 @@ const parse = string => {
 
 const url = new URL(process.env.url || process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe')
 
-const VERSION = '1.0.1'
+const VERSION = '1.1.0'
 
 const PARALLEL = 8
 const INTERVAL = Number.isNaN(Number(process.env.interval)) ? 480 : Number(process.env.interval)
