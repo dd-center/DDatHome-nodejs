@@ -28,7 +28,8 @@ const parse = string => {
 
 const url = new URL(process.env.url || process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe')
 
-const PARALLEL = 32
+let done = 0
+const PARALLEL = 128
 const INTERVAL = Number.isNaN(Number(process.env.interval)) ? 480 : Number(process.env.interval)
 
 if (!process.env.hide) {
@@ -90,7 +91,10 @@ const connect = () => new Promise(resolve => {
         data: body
       }))
       if (result) {
-        log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`, INTERVAL * PARALLEL - Date.now() + now)
+        if (verbose) {
+          done++
+        }
+        log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`, Math.round(process.uptime() * 1000 / done), INTERVAL * PARALLEL - Date.now() + now)
       }
       await wait(INTERVAL * PARALLEL - Date.now() + now)
     }
