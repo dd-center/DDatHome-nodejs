@@ -1,3 +1,4 @@
+const { version: VERSION } = require('./package.json')
 const { URL } = require('url') // Compatibility
 const WebSocket = require('ws')
 const got = require('got')
@@ -8,6 +9,8 @@ Thank you for participating DD@Home,
 Please read README.md for more information.
 ${Array(process.stdout.columns).fill('D').join('')}
 `)
+
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const parse = string => {
   try {
@@ -25,9 +28,7 @@ const parse = string => {
 
 const url = new URL(process.env.url || process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe')
 
-const VERSION = '1.1.0'
-
-const PARALLEL = 8
+const PARALLEL = 32
 const INTERVAL = Number.isNaN(Number(process.env.interval)) ? 480 : Number(process.env.interval)
 
 if (!process.env.hide) {
@@ -47,9 +48,9 @@ const verbose = process.env.development || process.env.verbose
 const log = verbose ? console.log : () => {}
 
 if (verbose) {
-  console.log('verbose log is on')
+  console.log('verbose log: on')
 } else {
-  console.log('verbose log is off')
+  console.log('verbose log: off')
 }
 
 if (process.env.development) {
@@ -65,26 +66,50 @@ console.log(`using: ${url}`)
 const connect = () => new Promise(resolve => {
   const ws = new WebSocket(url)
 
-  ws.on('message', async message => {
-    const json = parse(message)
-    if (json) {
+  let pending = []
+
+  const secureSend = data => {
+    if (ws.readyState === 1) {
+      ws.send(data)
+      return true
+    }
+  }
+
+  const processer = async () => {
+    await wait(INTERVAL * PARALLEL * Math.random())
+    while (true) {
       const now = Date.now()
-      const { key, url } = json
-      log('job received', url)
+      const { key, url } = await new Promise(resolve => {
+        pending.push(resolve)
+        secureSend('DDhttp')
+      })
       const time = Date.now()
-      const { body } = await got(url).catch(e => ({ body: { code: e.statusCode } }))
-      log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`)
-      ws.send(JSON.stringify({
+      const { body } = await got(url).catch(e => ({ body: JSON.stringify({ code: e.statusCode }) }))
+      const result = secureSend(JSON.stringify({
         key,
         data: body
       }))
-      setTimeout(() => ws.send('DDhttp'), INTERVAL * PARALLEL - Date.now() + now)
+      if (result) {
+        log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`, INTERVAL * PARALLEL - Date.now() + now)
+      }
+      await wait(INTERVAL * PARALLEL - Date.now() + now)
+    }
+  }
+
+  ws.on('message', async message => {
+    const json = parse(message)
+    if (json) {
+      const resolve = pending.shift()
+      if (resolve) {
+        log('job received', json.url)
+        resolve(json)
+      }
     }
   })
 
   ws.on('open', () => {
-    console.log('DD@Home connected')
-    Array(PARALLEL).fill().map(() => ws.send('DDhttp'))
+    log('DD@Home connected')
+    Array(PARALLEL).fill().map(processer)
   })
 
   ws.on('error', e => {
@@ -92,7 +117,7 @@ const connect = () => new Promise(resolve => {
   })
 
   ws.on('close', n => {
-    console.log(`closed ${n}`)
+    log(`closed ${n}`)
     setTimeout(resolve, 1000)
   })
 })
