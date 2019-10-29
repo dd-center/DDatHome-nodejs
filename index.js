@@ -29,7 +29,7 @@ const parse = string => {
 const url = new URL(process.env.url || process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe')
 
 let done = 0
-const PARALLEL = 128
+const PARALLEL = 48
 const INTERVAL = Number.isNaN(Number(process.env.interval)) ? 480 : Number(process.env.interval)
 
 if (!process.env.hide) {
@@ -67,7 +67,7 @@ console.log(`using: ${url}`)
 const connect = () => new Promise(resolve => {
   const ws = new WebSocket(url)
 
-  let pending = []
+  const pending = []
 
   const secureSend = data => {
     if (ws.readyState === 1) {
