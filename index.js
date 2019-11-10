@@ -13,6 +13,9 @@ ${Array(process.stdout.columns).fill('D').join('')}
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const parse = string => {
+  if (string === 'wait') {
+    return { empty: true }
+  }
   try {
     const json = JSON.parse(string)
     if (json) {
@@ -80,23 +83,28 @@ const connect = () => new Promise(resolve => {
     await wait(INTERVAL * PARALLEL * Math.random())
     while (true) {
       const now = Date.now()
-      const { key, url } = await new Promise(resolve => {
+      const pause = wait(INTERVAL * PARALLEL)
+      const { key, url, empty } = await new Promise(resolve => {
         pending.push(resolve)
-        secureSend('DDhttp')
+        secureSend('DDDhttp')
       })
-      const time = Date.now()
-      const { body } = await got(url).catch(e => ({ body: JSON.stringify({ code: e.statusCode }) }))
-      const result = secureSend(JSON.stringify({
-        key,
-        data: body
-      }))
-      if (result) {
-        if (verbose) {
-          done++
+      if (empty) {
+        log('wait')
+      } else {
+        const time = Date.now()
+        const { body } = await got(url).catch(e => ({ body: JSON.stringify({ code: e.statusCode }) }))
+        const result = secureSend(JSON.stringify({
+          key,
+          data: body
+        }))
+        if (result) {
+          if (verbose) {
+            done++
+          }
+          log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`, Math.round(process.uptime() * 1000 / done), INTERVAL * PARALLEL - Date.now() + now)
         }
-        log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`, Math.round(process.uptime() * 1000 / done), INTERVAL * PARALLEL - Date.now() + now)
       }
-      await wait(INTERVAL * PARALLEL - Date.now() + now)
+      await pause
     }
   }
 
@@ -105,7 +113,9 @@ const connect = () => new Promise(resolve => {
     if (json) {
       const resolve = pending.shift()
       if (resolve) {
-        log('job received', json.url)
+        if (json.url) {
+          log('job received', json.url)
+        }
         resolve(json)
       }
     }
