@@ -12,10 +12,9 @@ const parse = string => {
 }
 
 class DDAtHome extends EventEmitter {
-  constructor(url, { PARALLEL = 48, PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true } = {}) {
+  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true } = {}) {
     super()
     this.url = url
-    this.PARALLEL = PARALLEL
     this.PING_INTERVAL = PING_INTERVAL
     this.INTERVAL = INTERVAL
     this.stoped = false
@@ -29,44 +28,26 @@ class DDAtHome extends EventEmitter {
     const ws = new WebSocket(this.url)
     this.ws = ws
     return new Promise(resolve => {
-      const pending = []
-
-      const processer = async () => {
-        await wait(this.INTERVAL * this.PARALLEL * Math.random())
-        while (ws.readyState === 1) {
-          const now = Date.now()
-          const pause = wait(this.INTERVAL * this.PARALLEL)
-          const { key, url, empty } = await new Promise(resolve => {
-            pending.push(resolve)
-            this.secureSend('DDDhttp')
-          })
-          if (empty) {
-            this.emit('log', 'wait')
-          } else {
-            this.emit('log', 'job received', url)
-            this.emit('url', url)
-            const time = Date.now()
-            const { body } = await got(url).catch(e => ({ body: JSON.stringify({ code: e.statusCode }) }))
-            const result = this.secureSend(JSON.stringify({
-              key,
-              data: body
-            }))
-            if (result) {
-              this.emit('done', now, Date.now() - time, url)
-              this.emit('log', `job complete ${((Date.now() - time) / 1000).toFixed(2)}s`, this.INTERVAL * this.PARALLEL - Date.now() + now)
-            }
-          }
-          await pause
+      const processer = async ({ key, url }) => {
+        const now = Date.now()
+        this.emit('log', 'job received', url)
+        this.emit('url', url)
+        const time = Date.now()
+        const { body: data } = await got(url).catch(e => ({ body: JSON.stringify({ code: e.statusCode }) }))
+        const result = this.secureSend(JSON.stringify({
+          key,
+          data
+        }))
+        if (result) {
+          this.emit('done', now, Date.now() - time, url)
+          this.emit('log', `job complete ${((Date.now() - time) / 1000).toFixed(2)}s`)
         }
       }
 
       ws.on('message', message => {
         const { key, data, empty } = parse(message)
         if (empty) {
-          const resolve = pending.shift()
-          if (resolve) {
-            resolve({ empty })
-          }
+          this.emit('log', 'wait')
         } else if (data) {
           const { type, url, result } = data
           if (type === 'query') {
@@ -75,18 +56,22 @@ class DDAtHome extends EventEmitter {
               this.queryTable.delete(key)
             }
           } else if (type === 'http') {
-            const resolve = pending.shift()
-            if (resolve) {
-              resolve({ key, url })
-            }
+            processer({ key, url })
           }
         }
       })
 
+      const core = async () => {
+        while (ws.readyState === 1) {
+          this.secureSend('DDDhttp')
+          await wait(this.INTERVAL)
+        }
+      }
+
       ws.on('open', async () => {
         this.emit('log', 'DD@Home connected')
         this.emit('open')
-        Array(this.PARALLEL).fill().map(processer)
+        core()
 
         let lastPong = Date.now()
 

@@ -11,7 +11,6 @@ ${Array(process.stdout.columns).fill('D').join('')}
 
 const url = new URL(process.env.url || (process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe'))
 
-const PARALLEL = 48
 const INTERVAL = Number.isNaN(Number(process.env.interval)) ? 480 : Number(process.env.interval)
 const PING_INTERVAL = 1000 * 30
 
@@ -44,12 +43,11 @@ if (process.env.development) {
 console.log({
   INTERVAL,
   verbose,
-  log,
-  PARALLEL
+  log
 })
 
 console.log(`using: ${url}`)
 
-const ws = new DDAtHome(url, { PARALLEL, PING_INTERVAL, INTERVAL })
+const ws = new DDAtHome(url, { PING_INTERVAL, INTERVAL })
 
 ws.on('log', log)
