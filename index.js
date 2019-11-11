@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const { version: VERSION } = require('./package.json')
 const { URL } = require('url') // Compatibility
 const DDAtHome = require('./core')
