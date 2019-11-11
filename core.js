@@ -52,7 +52,7 @@ class DDAtHome extends EventEmitter {
               data: body
             }))
             if (result) {
-              this.emit('done', now, Date.now() - time)
+              this.emit('done', now, Date.now() - time, url)
               this.emit('log', `job complete ${((Date.now() - time) / 1000).toFixed(2)}s`, this.INTERVAL * this.PARALLEL - Date.now() + now)
             }
           }
