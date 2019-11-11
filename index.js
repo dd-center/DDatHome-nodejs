@@ -1,4 +1,4 @@
-const { version: VERSION } = require('./package.json')
+const VERSION = '1.4.0'
 const { URL } = require('url') // Compatibility
 const DDAtHome = require('./core')
 
