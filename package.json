@@ -6,6 +6,7 @@
     "start": "node index.js"
   },
   "main": "core.js",
+  "bin": "index.js",
   "dependencies": {
     "got": "^9.6.0",
     "ws": "^7.1.2"
