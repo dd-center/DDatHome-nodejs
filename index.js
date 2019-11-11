@@ -28,12 +28,12 @@ const parse = string => {
     return undefined
   }
 }
-
-const url = new URL(process.env.url || process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe')
+const url = new URL(process.env.url || (process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe'))
 
 let done = 0
 const PARALLEL = 48
 const INTERVAL = Number.isNaN(Number(process.env.interval)) ? 480 : Number(process.env.interval)
+const PING_INTERVAL = 1000 * 30
 
 if (!process.env.hide) {
   url.searchParams.set('runtime', `node${process.version}`)
@@ -62,7 +62,10 @@ if (process.env.development) {
 }
 
 console.log({
-  INTERVAL
+  INTERVAL,
+  verbose,
+  log,
+  PARALLEL
 })
 
 console.log(`using: ${url}`)
@@ -121,9 +124,25 @@ const connect = () => new Promise(resolve => {
     }
   })
 
-  ws.on('open', () => {
+  ws.on('open', async () => {
     log('DD@Home connected')
     Array(PARALLEL).fill().map(processer)
+
+    let lastPong = Date.now()
+
+    ws.on('pong', () => {
+      log('pong')
+      lastPong = Date.now()
+    })
+
+    while (ws.readyState === 1) {
+      ws.ping()
+      await wait(PING_INTERVAL)
+      if ((Date.now() - lastPong - PING_INTERVAL * 5) > 0) {
+        log('timeout')
+        ws.close(4663, 'timeout')
+      }
+    }
   })
 
   ws.on('error', e => {
