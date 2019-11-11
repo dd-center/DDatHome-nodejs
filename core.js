@@ -109,9 +109,9 @@ class DDAtHome extends EventEmitter {
         console.error(`error: ${e.message}`)
       })
 
-      ws.on('close', n => {
+      ws.on('close', (n, reason) => {
         this.emit('log', `closed ${n}`)
-        this.emit('close')
+        this.emit('close', n, reason)
         setTimeout(resolve, 1000)
       })
     })
