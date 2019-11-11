@@ -7,6 +7,14 @@ Cluster Manager and Protocol: <https://github.com/dd-center/Cluster-center>
 
 Thank you for participating DD@Home!
 
+### npx
+
+You need to install Node.js at <https://nodejs.org/en/download/>
+
+```sh
+npx -p dd-center/DDatHome-nodejs ddatnodejs
+```
+
 ### Docker
 
 Docker Hub: <https://hub.docker.com/r/simon300000/ddathome-nodejs>
