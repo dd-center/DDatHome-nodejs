@@ -12,7 +12,7 @@ Thank you for participating DD@Home!
 You need to install Node.js at <https://nodejs.org/en/download/>
 
 ```sh
-npx -p dd-center/DDatHome-nodejs ddatnodejs
+npx dd-center/DDatHome-nodejs
 ```
 
 ### Docker
