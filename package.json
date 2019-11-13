@@ -9,6 +9,7 @@
   "bin": "index.js",
   "dependencies": {
     "got": "^9.6.0",
+    "neodoc": "^2.0.2",
     "ws": "^7.1.2"
   }
 }
