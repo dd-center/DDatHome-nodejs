@@ -73,7 +73,7 @@ function start({
   })
   console.log(`using: ${url}\n`)
 
-  const ws = new DDAtHome(url, { PING_INTERVAL, INTERVAL: interval })
+  const ws = new DDAtHome(url, { PING_INTERVAL: pingInterval, INTERVAL: interval })
 
   if (verbose) {
     ws.on('log', console.log)
