@@ -5,7 +5,7 @@ const { URL } = require('url') // Compatibility
 const DDAtHome = require('./core')
 const neodoc = require('neodoc')
 
-const args = neodoc.run(`${welcome()}
+const args = neodoc.run(`Start DD@Home client.
 
 Usage:
   DDatHome-nodejs [options]
@@ -44,7 +44,7 @@ function start({
   nickname,
   verbose = false
 }) {
-  console.log(welcome())
+  console.log(welcome() + '\n')
 
   url = new URL(url)
 
@@ -71,8 +71,7 @@ function start({
     INTERVAL: interval,
     verbose
   })
-
-  console.log(`using: ${url}`)
+  console.log(`using: ${url}\n`)
 
   const ws = new DDAtHome(url, { PING_INTERVAL, INTERVAL: interval })
 
