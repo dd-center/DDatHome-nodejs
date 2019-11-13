@@ -39,7 +39,6 @@ start({
 function start({
   url,
   interval = 480,
-  pingInterval = 1000 * 30,
   anonymous = false,
   nickname,
   verbose = false
@@ -52,8 +51,6 @@ function start({
     throw new TypeError(`interval is not a number: ${interval}`)
   }
   
-  const PING_INTERVAL = 1000 * 30
-
   if (!anonymous) {
     url.searchParams.set('runtime', `node${process.version}`)
     url.searchParams.set('version', VERSION)
@@ -73,7 +70,7 @@ function start({
   })
   console.log(`using: ${url}\n`)
 
-  const ws = new DDAtHome(url, { PING_INTERVAL: pingInterval, INTERVAL: interval })
+  const ws = new DDAtHome(url, { INTERVAL: interval })
 
   if (verbose) {
     ws.on('log', console.log)
