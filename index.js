@@ -22,7 +22,7 @@ Options:
                      
   --nickname=<name>  Use a nickname. [env: NICKNAME]
   --verbose          Be more verbose. [env: VERBOSE]
-`, {version: VERSION})
+`, { version: VERSION })
 
 if (process.env.development) {
   console.log('Development Environment Detected')
@@ -47,10 +47,16 @@ function start({
 
   url = new URL(url)
 
-  if (!interval || typeof interval !== 'number') {
+  // input such as `false`, `''`
+  if ((typeof interval !== 'number' && !interval) || isNaN(Number(interval))) {
     throw new TypeError(`interval is not a number: ${interval}`)
   }
-  
+
+  // env values might be string
+  if (typeof interval === 'string') {
+    interval = Number(interval)
+  }
+
   if (!anonymous) {
     url.searchParams.set('runtime', `node${process.version}`)
     url.searchParams.set('version', VERSION)
