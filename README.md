@@ -63,16 +63,28 @@ pm2 start ecosystem.config.js
 
 ## Settings
 
-Edit Settings by environment variables.
+Edit Settings by environment variables or by command line arguments.
+
+#### CLI:
+
+```
+  --url=<URL>        URL to the websocket server.
+  --interval=<time>  Interval to pull tasks (ms).
+  --anonymous        Do not send platform info to the server.
+  --nickname=<name>  Use a nickname. [env: NICKNAME]
+  --verbose          Be more verbose. [env: VERBOSE]
+```
+
+#### ENV:
 
 | ENV      | Default                  | Document                                                     |
 | -------- | ------------------------ | ------------------------------------------------------------ |
-| url      | `wss://cluster.vtbs.moe` | Upstream URL                                                 |
-| interval | `480`                    | Task interval in ms                                          |
-| hide     | `false` *                | hide all extra information including platform, client version, Node.js runtime version, docker status ** |
-| nickname | `undefined`              | A optional nickname to display on statistics board (in progress). |
+| URL      | `wss://cluster.vtbs.moe` | Upstream URL                                                 |
+| INTERVAL | `480`                    | Task interval in ms                                          |
+| HIDE     | `false` *                | hide all extra information including platform, client version, Node.js runtime version, docker status ** |
+| NICKNAME | `undefined`              | A optional nickname to display on statistics board (in progress). |
 | Docker   | Depends                  | Is Docker environment?                                       |
-| verbose  | `false` *                | Verbose log                                                  |
+| VERBOSE  | `false` *                | Verbose log                                                  |
 
 \* giving any value will make it `true`
 

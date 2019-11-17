@@ -86,6 +86,7 @@ function start({
 function welcome() {
   return `${'D'.repeat(process.stdout.columns - 1)}
 Thank you for participating DD@Home,
-Please read README.md for more information.
+Please read README.md for more information;
+Type -h for command line options.
 ${'D'.repeat(process.stdout.columns - 1)}`
 }
