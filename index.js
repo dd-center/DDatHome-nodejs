@@ -3,53 +3,90 @@
 const { version: VERSION } = require('./package.json')
 const { URL } = require('url') // Compatibility
 const DDAtHome = require('./core')
+const neodoc = require('neodoc')
 
-console.log(`
-${Array(process.stdout.columns).fill('D').join('')}
-Thank you for participating DD@Home,
-Please read README.md for more information.
-${Array(process.stdout.columns).fill('D').join('')}
-`)
+const args = neodoc.run(`Start DD@Home client.
 
-const url = new URL(process.env.url || (process.env.development ? 'ws://0.0.0.0:9013' : 'wss://cluster.vtbs.moe'))
-
-const INTERVAL = Number.isNaN(Number(process.env.interval)) ? 480 : Number(process.env.interval)
-const PING_INTERVAL = 1000 * 30
-
-if (!process.env.hide) {
-  url.searchParams.set('runtime', `node${process.version}`)
-  url.searchParams.set('version', VERSION)
-  url.searchParams.set('platform', process.platform)
-  if (process.env.docker) {
-    url.searchParams.set('docker', 'docker')
-  }
-}
-
-if (process.env.nickname) {
-  url.searchParams.set('name', process.env.nickname)
-}
-
-const verbose = process.env.development || process.env.verbose
-const log = verbose ? console.log : () => {}
-
-if (verbose) {
-  console.log('verbose log: on')
-} else {
-  console.log('verbose log: off')
-}
+Usage:
+  DDatHome-nodejs [options]
+  
+Options:
+  --url=<URL>        URL to the websocket server.
+                     [env: URL] [default: wss://cluster.vtbs.moe]
+                     
+  --interval=<time>  Interval to pull tasks (ms).
+                     [env: INTERVAL] [default: 480]
+                     
+  --anonymous        Do not send platform info to the server.
+                     [env: HIDE]
+                     
+  --nickname=<name>  Use a nickname. [env: NICKNAME]
+  --verbose          Be more verbose. [env: VERBOSE]
+`, { version: VERSION })
 
 if (process.env.development) {
   console.log('Development Environment Detected')
 }
 
-console.log({
-  INTERVAL,
-  verbose,
-  log
+start({
+  url: process.env.development ? 'ws://0.0.0.0:9013' : args['--url'],
+  interval: args['--interval'],
+  anonymous: args['--anonymous'],
+  nickname: args['--nickname'],
+  verbose: process.env.development || args['--verbose']
 })
 
-console.log(`using: ${url}`)
+function start({
+  url,
+  interval = 480,
+  anonymous = false,
+  nickname,
+  verbose = false
+}) {
+  console.log(welcome() + '\n')
 
-const ws = new DDAtHome(url, { PING_INTERVAL, INTERVAL })
+  url = new URL(url)
 
-ws.on('log', log)
+  // input such as `false`, `''`
+  if ((typeof interval !== 'number' && !interval) || isNaN(Number(interval))) {
+    throw new TypeError(`interval is not a number: ${interval}`)
+  }
+
+  // env values might be string
+  if (typeof interval === 'string') {
+    interval = Number(interval)
+  }
+
+  if (!anonymous) {
+    url.searchParams.set('runtime', `node${process.version}`)
+    url.searchParams.set('version', VERSION)
+    url.searchParams.set('platform', process.platform)
+    if (process.env.docker) {
+      url.searchParams.set('docker', 'docker')
+    }
+  }
+
+  if (nickname) {
+    url.searchParams.set('name', nickname)
+  }
+
+  console.log({
+    INTERVAL: interval,
+    verbose
+  })
+  console.log(`using: ${url}\n`)
+
+  const ws = new DDAtHome(url, { INTERVAL: interval })
+
+  if (verbose) {
+    ws.on('log', console.log)
+  }
+}
+
+function welcome() {
+  return `${'D'.repeat(process.stdout.columns - 1)}
+Thank you for participating DD@Home,
+Please read README.md for more information;
+Type -h for command line options.
+${'D'.repeat(process.stdout.columns - 1)}`
+}
