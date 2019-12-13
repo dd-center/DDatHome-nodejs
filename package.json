@@ -8,7 +8,7 @@
   "main": "core.js",
   "bin": "index.js",
   "dependencies": {
-    "got": "^10.0.3",
+    "got": "^10.0.4",
     "neodoc": "^2.0.2",
     "ws": "^7.1.2"
   }
