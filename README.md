@@ -1,4 +1,4 @@
-# DDatHome nodejs
+# DDatHome nodejs ![Node CI](https://github.com/dd-center/DDatHome-nodejs/workflows/Core%20CI/badge.svg)
 This is Node.js Client of Project ***DD@Home***.
 
 Cluster Manager and Protocol: <https://github.com/dd-center/Cluster-center>

@@ -1,0 +1,19 @@
+name: Core CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Use Node.js 13
+      uses: actions/setup-node@master
+      with:
+        node-version: '13'
+    - name: npm install
+      run: npm install
+    - name: npm test
+      run: npm test

@@ -3,7 +3,8 @@
   "name": "ddatnodejs",
   "version": "1.4.0",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node test.js"
   },
   "main": "core.js",
   "bin": "index.js",
