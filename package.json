@@ -9,7 +9,7 @@
   "main": "core.js",
   "bin": "index.js",
   "dependencies": {
-    "got": "^10.0.4",
+    "got": "^10.1.0",
     "neodoc": "^2.0.2",
     "ws": "^7.1.2"
   }
