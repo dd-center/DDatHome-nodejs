@@ -4,6 +4,7 @@
   "version": "1.4.0",
   "scripts": {
     "start": "node index.js",
+    "pack": "node pkg.js",
     "test": "node test.js"
   },
   "main": "core.js",
