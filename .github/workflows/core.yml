@@ -3,7 +3,7 @@ name: Core CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
 
     runs-on: macos-latest
 
@@ -17,3 +17,23 @@ jobs:
       run: npm install
     - name: npm test
       run: npm test
+
+  pack:
+    needs: test
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Use Node.js 12
+      uses: actions/setup-node@master
+      with:
+        node-version: '12'
+    - name: npm install
+      run: npm install
+    - name: npm pack
+      run: npm run pack
+    - name: Release
+      uses: fnkr/github-action-ghr@v1
+      env:
+        GHR_PATH: dist/
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
