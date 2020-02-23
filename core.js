@@ -45,7 +45,10 @@ class DDAtHome extends EventEmitter {
       }
 
       ws.on('message', message => {
-        const { key, data, empty } = parse(message)
+        const { key, data, empty, payload } = parse(message)
+        if (payload) {
+          this.emit('payload', payload)
+        }
         if (empty) {
           this.emit('log', 'wait')
         } else if (data) {
