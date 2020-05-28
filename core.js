@@ -119,6 +119,7 @@ class DDAtHome extends EventEmitter {
       this.secureSend(JSON.stringify({ key, query }))
       setTimeout(() => {
         if (this.queryTable.has(key)) {
+          this.queryTable.delete(key)
           reject(new Error('timeout'))
         }
       }, 1000 * 5)
