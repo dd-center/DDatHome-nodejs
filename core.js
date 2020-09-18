@@ -33,7 +33,7 @@ class DDAtHome extends EventEmitter {
         this.emit('log', 'job received', url)
         this.emit('url', url)
         const time = Date.now()
-        const { body: data } = await got(url).catch(e => ({ body: JSON.stringify({ code: e.statusCode }) }))
+        const { body: data } = await got(url, { headers: { Cookie: '_uuid=' } }).catch(e => ({ body: JSON.stringify({ code: e.statusCode }) }))
         const result = this.secureSend(JSON.stringify({
           key,
           data
