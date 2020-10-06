@@ -1,6 +1,7 @@
 const WebSocket = require('ws')
 const got = require('got')
 const EventEmitter = require('events')
+const relay = require('./relay')
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -134,6 +135,7 @@ class DDAtHome extends EventEmitter {
   }
 
   async start() {
+    relay(this)
     while (!this.stoped) {
       await this.connect()
     }
