@@ -47,6 +47,7 @@ module.exports = home => {
     opened.add(roomid)
     printStatus()
     const live = new KeepLiveWS(roomid, { address, key })
+    live.interval = 60 * 1000
     live.on('live', () => {
       log(`LIVE: ${roomid}`)
       lived.add(roomid)
