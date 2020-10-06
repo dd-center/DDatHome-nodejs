@@ -15,7 +15,7 @@ Options:
                      [env: URL] [default: wss://cluster.vtbs.moe]
                      
   --interval=<time>  Interval to pull tasks (ms).
-                     [env: INTERVAL] [default: 480]
+                     [env: INTERVAL] [default: 980]
                      
   --anonymous        Do not send platform info to the server.
                      [env: HIDE]
