@@ -27,6 +27,7 @@ module.exports = (home) => {
   const lived = new Set()
   const printStatus = () => {
     log(`living/opening/limit: ${lived.size} / ${rooms.size} / ${home.wsLimit}`)
+    home.emit('relayStatus', { lived: lived.size, rooms: rooms.size })
   }
 
   const processWaiting = async () => {
