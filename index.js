@@ -16,6 +16,9 @@ Options:
                      
   --interval=<time>  Interval to pull tasks (ms).
                      [env: INTERVAL] [default: 980]
+
+  --ws-limit=<limit>  Limit of WebSocket connections to live.bilibili.com
+                     [env: LIMIT]
                      
   --anonymous        Do not send platform info to the server.
                      [env: HIDE]
@@ -33,6 +36,7 @@ start({
   interval: args['--interval'],
   anonymous: args['--anonymous'],
   nickname: args['--nickname'],
+  limit: args['--ws-limit'],
   verbose: process.env.development || args['--verbose']
 })
 
@@ -41,6 +45,7 @@ function start({
   interval = 480,
   anonymous = false,
   nickname,
+  limit = Infinity,
   verbose = false
 }) {
   console.log(welcome() + '\n')
@@ -50,6 +55,9 @@ function start({
   // input such as `false`, `''`
   if ((typeof interval !== 'number' && !interval) || isNaN(Number(interval))) {
     throw new TypeError(`interval is not a number: ${interval}`)
+  }
+  if ((typeof limit !== 'number' && !limit) || isNaN(Number(limit))) {
+    throw new TypeError(`limit is not a number: ${limit}`)
   }
 
   // env values might be string
@@ -72,11 +80,12 @@ function start({
 
   console.log({
     INTERVAL: interval,
+    limit,
     verbose
   })
   console.log(`using: ${url}\n`)
 
-  const ws = new DDAtHome(url, { INTERVAL: interval })
+  const ws = new DDAtHome(url, { INTERVAL: interval, wsLimit: limit })
 
   if (verbose) {
     ws.on('log', console.log)

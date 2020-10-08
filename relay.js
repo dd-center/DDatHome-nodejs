@@ -3,7 +3,7 @@ const { getConf: getConfW } = require('bilibili-live-ws/extra')
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-module.exports = home => {
+module.exports = (home, limit = Infinity) => {
   const log = (...msg) => {
     home.emit('log', 'relay', ...msg)
     home.emit('relay', ...msg)
@@ -14,7 +14,7 @@ module.exports = home => {
   const rooms = new Set()
   const lived = new Set()
   const printStatus = () => {
-    log(`living/opening: ${lived.size}/${rooms.size}`)
+    log(`living/opening/limit: ${lived.size} / ${rooms.size} / ${limit}`)
   }
 
   const processWaiting = async () => {
@@ -115,7 +115,7 @@ module.exports = home => {
 
   home.once('open', () => {
     setInterval(() => {
-      if (rooms.size === lived.size) {
+      if (rooms.size === lived.size && rooms.size < limit) {
         home.ask({ type: 'pickRoom' }).then(roomid => watch(roomid))
       }
     }, 5 * 1000)

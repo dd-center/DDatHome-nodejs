@@ -13,13 +13,14 @@ const parse = string => {
 }
 
 class DDAtHome extends EventEmitter {
-  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true } = {}) {
+  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity } = {}) {
     super()
     this.url = url
     this.PING_INTERVAL = PING_INTERVAL
     this.INTERVAL = INTERVAL
     this.stoped = false
     this.queryTable = new Map()
+    this.wsLimit = wsLimit
     if (start) {
       this.start()
     }
@@ -135,7 +136,7 @@ class DDAtHome extends EventEmitter {
   }
 
   async start() {
-    relay(this)
+    relay(this, this.wsLimit)
     while (!this.stoped) {
       await this.connect()
     }
