@@ -6,7 +6,7 @@ const { getConf: getConfW } = require('bilibili-live-ws/extra')
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 module.exports = (home) => {
-  const emitter = new EventEmitter()
+  const emitter = new EventEmitter().setMaxListeners(Infinity)
 
   let start = false
   emitter.on('start', () => {
@@ -116,7 +116,7 @@ module.exports = (home) => {
       send({ roomid, e: 'GUARD_BUY', data: { mid, uname, num, price, giftId, level }, token })
     })
     if (start) {
-      emitter.on('stop', () => {
+      emitter.once('stop', () => {
         lived.delete(roomid)
         live.close()
       })
@@ -131,7 +131,7 @@ module.exports = (home) => {
       rooms.add(roomid)
       log(`WATCH: ${roomid}`)
       openRoom(roomid)
-      emitter.on('stop', () => {
+      emitter.once('stop', () => {
         rooms.delete(roomid)
       })
     }
