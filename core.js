@@ -21,6 +21,7 @@ class DDAtHome extends EventEmitter {
     this.stoped = false
     this.queryTable = new Map()
     this.wsLimit = wsLimit
+    this.relay = relay(this)
     if (start) {
       this.start()
     }
@@ -130,13 +131,14 @@ class DDAtHome extends EventEmitter {
 
   stop() {
     this.stoped = true
+    this.relay.emit('stop')
     if (this.ws.readyState === 1) {
       this.ws.close()
     }
   }
 
   async start() {
-    relay(this, this.wsLimit)
+    this.relay.emit('start')
     while (!this.stoped) {
       await this.connect()
     }

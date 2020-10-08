@@ -1,9 +1,21 @@
+const EventEmitter = require('events')
+
 const { KeepLiveWS } = require('bilibili-live-ws')
 const { getConf: getConfW } = require('bilibili-live-ws/extra')
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-module.exports = (home, limit = Infinity) => {
+module.exports = (home) => {
+  const emitter = new EventEmitter()
+
+  let start = false
+  emitter.on('start', () => {
+    start = true
+  })
+  emitter.on('stop', () => {
+    start = false
+  })
+
   const log = (...msg) => {
     home.emit('log', 'relay', ...msg)
     home.emit('relay', ...msg)
@@ -14,7 +26,7 @@ module.exports = (home, limit = Infinity) => {
   const rooms = new Set()
   const lived = new Set()
   const printStatus = () => {
-    log(`living/opening/limit: ${lived.size} / ${rooms.size} / ${limit}`)
+    log(`living/opening/limit: ${lived.size} / ${rooms.size} / ${home.wsLimit}`)
   }
 
   const processWaiting = async () => {
@@ -103,6 +115,15 @@ module.exports = (home, limit = Infinity) => {
       const token = `${roomid}_GUARD_BUY_${mid}_${time}`
       send({ roomid, e: 'GUARD_BUY', data: { mid, uname, num, price, giftId, level }, token })
     })
+    if (start) {
+      emitter.on('stop', () => {
+        lived.delete(roomid)
+        live.close()
+      })
+    } else {
+      lived.delete(roomid)
+      live.close()
+    }
   }
 
   const watch = roomid => {
@@ -110,14 +131,19 @@ module.exports = (home, limit = Infinity) => {
       rooms.add(roomid)
       log(`WATCH: ${roomid}`)
       openRoom(roomid)
+      emitter.on('stop', () => {
+        rooms.delete(roomid)
+      })
     }
   }
 
   home.once('open', () => {
     setInterval(() => {
-      if (rooms.size === lived.size && rooms.size < limit) {
+      if (rooms.size === lived.size && rooms.size < home.wsLimit && start) {
         home.ask({ type: 'pickRoom' }).then(roomid => watch(roomid))
       }
     }, 5 * 1000)
   })
+
+  return emitter
 }
