@@ -12,11 +12,9 @@ module.exports = home => {
 
   const waiting = []
   const rooms = new Set()
-
-  const opened = new Set()
   const lived = new Set()
   const printStatus = () => {
-    log(`living/opening: ${lived.size}/${opened.size}`)
+    log(`living/opening: ${lived.size}/${rooms.size}`)
   }
 
   const processWaiting = async () => {
@@ -44,7 +42,6 @@ module.exports = home => {
   const openRoom = async roomid => {
     const { address, key } = await getConf(roomid)
     log(`OPEN: ${roomid}`)
-    opened.add(roomid)
     printStatus()
     const live = new KeepLiveWS(roomid, { address, key })
     live.interval = 60 * 1000
@@ -118,7 +115,7 @@ module.exports = home => {
 
   home.once('open', () => {
     setInterval(() => {
-      if (opened.size === lived.size) {
+      if (rooms.size === lived.size) {
         home.ask({ type: 'pickRoom' }).then(roomid => watch(roomid))
       }
     }, 5 * 1000)
