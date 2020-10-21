@@ -11,7 +11,7 @@
   "bin": "index.js",
   "dependencies": {
     "bilibili-live-ws": "^5.1.1",
-    "got": "^11.6.2",
+    "got": "^11.8.0",
     "neodoc": "^2.0.2",
     "ws": "^7.3.1"
   },
