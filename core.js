@@ -1,9 +1,17 @@
 const WebSocket = require('ws')
 const got = require('got')
 const EventEmitter = require('events')
+const CacheableLookup = require('cacheable-lookup')
+const QuickLRU = require('quick-lru')
+
 const relay = require('./relay')
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+const dnsCache = new CacheableLookup({
+  maxTtl: 60,
+  cache: new QuickLRU({ maxSize: 1000 })
+})
 
 const parse = string => {
   if (string === 'wait') {
@@ -36,7 +44,7 @@ class DDAtHome extends EventEmitter {
         this.emit('log', 'job received', url)
         this.emit('url', url)
         const time = Date.now()
-        const { body: data } = await got(url, { headers: { Cookie: '_uuid=;rpdid=' } }).catch(e => ({ body: JSON.stringify({ code: e.response.statusCode }) }))
+        const { body: data } = await got(url, { headers: { Cookie: '_uuid=;rpdid=' }, dnsCache }).catch(e => ({ body: JSON.stringify({ code: e.response.statusCode }) }))
         const result = this.secureSend(JSON.stringify({
           key,
           data
