@@ -15,7 +15,7 @@ Options:
                      [env: URL] [default: wss://cluster.vtbs.moe]
                      
   --interval=<time>  Interval to pull tasks (ms).
-                     [env: INTERVAL] [default: 980]
+                     [env: INTERVAL] [default: 1280]
 
   --ws-limit=<limit>  Limit of WebSocket connections to live.bilibili.com
                      [env: LIMIT]
