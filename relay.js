@@ -141,7 +141,11 @@ module.exports = (home) => {
   home.once('open', () => {
     setInterval(() => {
       if (rooms.size === lived.size && rooms.size < home.wsLimit && start) {
-        home.ask({ type: 'pickRoom' }).then(roomid => watch(roomid))
+        home.ask({ type: 'pickRoom' })
+          .then(roomid => watch(roomid))
+          .catch(e => {
+            console.error('ask pickRoom error', e)
+          })
       }
     }, 5 * 1000)
   })
