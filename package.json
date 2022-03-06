@@ -11,7 +11,7 @@
   "bin": "index.js",
   "dependencies": {
     "bilibili-live-ws": "^5.1.1",
-    "cacheable-lookup": "^5.0.3",
+    "cacheable-lookup": "^6.0.4",
     "got": "^11.6.2",
     "neodoc": "^2.0.2",
     "quick-lru": "^5.1.1",
