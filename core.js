@@ -1,10 +1,10 @@
-const WebSocket = require('ws')
-const got = require('got')
-const EventEmitter = require('events')
-const CacheableLookup = require('cacheable-lookup')
-const QuickLRU = require('quick-lru')
+import WebSocket from 'ws'
+import got from 'got'
+import EventEmitter from 'events'
+import CacheableLookup from 'cacheable-lookup'
+import QuickLRU from 'quick-lru'
 
-const relay = require('./relay')
+import relay from './relay.js'
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -20,7 +20,7 @@ const parse = string => {
   return JSON.parse(string)
 }
 
-class DDAtHome extends EventEmitter {
+export default class DDAtHome extends EventEmitter {
   constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity } = {}) {
     super()
     this.url = url
@@ -152,5 +152,3 @@ class DDAtHome extends EventEmitter {
     }
   }
 }
-
-module.exports = DDAtHome

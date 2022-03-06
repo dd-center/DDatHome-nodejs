@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
-const { version: VERSION } = require('./package.json')
-const { URL } = require('url') // Compatibility
-const DDAtHome = require('./core')
-const neodoc = require('neodoc')
+import version from './version.cjs'
+
+import { URL } from 'url'
+import DDAtHome from './core.js'
+import neodoc from 'neodoc'
+
+const VERSION = version()
 
 const args = neodoc.run(`Start DD@Home client.
 

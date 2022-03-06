@@ -1,11 +1,15 @@
-const EventEmitter = require('events')
+import EventEmitter from 'events'
 
-const { KeepLiveWS } = require('bilibili-live-ws')
-const { getConf: getConfW } = require('bilibili-live-ws/extra')
+import bilibiliLiveWs from 'bilibili-live-ws'
+import extra from 'bilibili-live-ws/extra.js'
+
+const { KeepLiveWS } = bilibiliLiveWs
+
+const { getConf: getConfW } = extra
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-module.exports = (home) => {
+export default home => {
   const emitter = new EventEmitter().setMaxListeners(Infinity)
 
   let start = false
