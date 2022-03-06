@@ -12,7 +12,7 @@
   "dependencies": {
     "bilibili-live-ws": "^5.1.1",
     "cacheable-lookup": "^6.0.4",
-    "got": "^11.6.2",
+    "got": "^12.0.1",
     "neodoc": "^2.0.2",
     "quick-lru": "^5.1.1",
     "ws": "^8.5.0"
