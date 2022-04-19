@@ -10,7 +10,7 @@
   "main": "core.js",
   "bin": "index.js",
   "dependencies": {
-    "bilibili-live-ws": "^5.1.1",
+    "bilibili-live-ws": "^6.2.0",
     "cacheable-lookup": "^6.0.4",
     "got": "^11.6.2",
     "neodoc": "^2.0.2",
