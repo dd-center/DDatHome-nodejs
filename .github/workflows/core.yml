@@ -16,8 +16,22 @@ jobs:
     - name: npm test
       run: npm test
 
-  pack:
+  pack-test:
     needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Use Node.js 16
+      uses: actions/setup-node@master
+      with:
+        node-version: '16'
+    - name: npm install
+      run: npm install
+    - name: npm pack
+      run: npm run pack
+
+  pack:
+    needs: pack-test
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
 
