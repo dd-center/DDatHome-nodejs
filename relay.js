@@ -1,7 +1,7 @@
-const EventEmitter = require('events')
+import EventEmitter from 'events'
 
-const got = require('got')
-const { KeepLiveWS } = require('bilibili-live-ws')
+import got from 'got'
+import { KeepLiveWS } from 'bilibili-live-ws'
 
 const getConfW = async (roomid, opts) => {
   const { data: { token: key, host_list: [{ host }] } } = await got(`https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${roomid}`, opts).json()
@@ -11,7 +11,7 @@ const getConfW = async (roomid, opts) => {
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-module.exports = (home) => {
+export default (home) => {
   const emitter = new EventEmitter().setMaxListeners(Infinity)
 
   let start = false

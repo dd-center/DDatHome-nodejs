@@ -1,5 +1,5 @@
-const { version: VERSION } = require('./package.json')
-const DDAtHome = require('./core')
+import VERSION from './version.cjs'
+import { DDAtHome } from './core.js'
 
 const interval = 480
 

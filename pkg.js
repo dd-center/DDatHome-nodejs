@@ -1,4 +1,4 @@
-const { exec } = require('pkg')
+import { exec } from 'pkg'
 
 ;
 
@@ -8,4 +8,4 @@ const { exec } = require('pkg')
   ['node16-linux-x64']
 ].map(([target, e = '']) => ['index.js', '--target', target, '--output', `./dist/${target}${e}`])
   .map(params => () => exec(params))
-  .reduce((p, f) => p.then(f), Promise.resolve(233))
+  .reduce((p, f) => p.then(f), Promise.resolve())
