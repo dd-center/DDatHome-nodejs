@@ -8,7 +8,7 @@ const relay = require('./relay')
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-const dnsCache = new CacheableLookup({
+const dnsLookupCache = new CacheableLookup({
   maxTtl: 60,
   cache: new QuickLRU({ maxSize: 1000 })
 })
@@ -21,7 +21,7 @@ const parse = string => {
 }
 
 class DDAtHome extends EventEmitter {
-  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity } = {}) {
+  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity, dnsCache = true } = {}) {
     super()
     this.url = url
     this.PING_INTERVAL = PING_INTERVAL
@@ -30,6 +30,7 @@ class DDAtHome extends EventEmitter {
     this.queryTable = new Map()
     this.wsLimit = wsLimit
     this.relay = relay(this)
+    this.dnsCache = dnsCache
     if (start) {
       this.start()
     }
@@ -44,7 +45,11 @@ class DDAtHome extends EventEmitter {
         this.emit('log', 'job received', url)
         this.emit('url', url)
         const time = Date.now()
-        const { body: data } = await got(url, { headers: { Cookie: '_uuid=;rpdid=' }, dnsCache }).catch(async e => ({ body: JSON.stringify({ code: e.response.statusCode }) })).catch(()=>({ body: JSON.stringify({ code: 233 }) }))
+        const opts = { headers: { Cookie: '_uuid=;rpdid=' } }
+        if (this.dnsCache) {
+          opts.dnsCache = dnsLookupCache
+        }
+        const { body: data } = await got(url, opts).catch(async e => ({ body: JSON.stringify({ code: e.response.statusCode }) })).catch(() => ({ body: JSON.stringify({ code: 233 }) }))
         const result = this.secureSend(JSON.stringify({
           key,
           data

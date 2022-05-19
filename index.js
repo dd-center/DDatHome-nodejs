@@ -17,8 +17,11 @@ Options:
   --interval=<time>  Interval to pull tasks (ms).
                      [env: INTERVAL] [default: 1280]
 
-  --ws-limit=<limit>  Limit of WebSocket connections to live.bilibili.com
+  --ws-limit=<limit> Limit of WebSocket connections to live.bilibili.com
                      [env: LIMIT]
+                     
+  --no-dns-cache     Disable DNS cache
+                     [env: NO_DNS_CACHE]
                      
   --anonymous        Do not send platform info to the server.
                      [env: HIDE]
@@ -37,6 +40,7 @@ start({
   anonymous: args['--anonymous'],
   nickname: args['--nickname'],
   limit: args['--ws-limit'],
+  noDnsCache: args['--no-dns-cache'],
   verbose: process.env.development || args['--verbose']
 })
 
@@ -46,6 +50,7 @@ function start({
   anonymous = false,
   nickname,
   limit = Infinity,
+  noDnsCache = false,
   verbose = false
 }) {
   console.log(welcome() + '\n')
@@ -81,11 +86,12 @@ function start({
   console.log({
     INTERVAL: interval,
     limit,
+    noDnsCache,
     verbose
   })
   console.log(`using: ${url}\n`)
 
-  const ws = new DDAtHome(url, { INTERVAL: interval, wsLimit: limit })
+  const ws = new DDAtHome(url, { INTERVAL: interval, wsLimit: limit, dnsCache: !noDnsCache })
 
   if (verbose) {
     ws.on('log', console.log)
