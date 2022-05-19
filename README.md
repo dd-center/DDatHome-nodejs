@@ -73,22 +73,40 @@ Edit Settings by environment variables or by command line arguments.
 
 ```
   --url=<URL>        URL to the websocket server.
+                     [env: URL] [default: wss://cluster.vtbs.moe]
+                     
   --interval=<time>  Interval to pull tasks (ms).
+                     [env: INTERVAL] [default: 1280]
+
+  --ws-limit=<limit> Limit of WebSocket connections to live.bilibili.com.
+                     [env: LIMIT]
+
+  --uuid=<uuid>      UUID for stats tracking.
+                     [env: UUID]
+                     
+  --no-dns-cache     Disable DNS cache
+                     [env: NO_DNS_CACHE]
+                     
   --anonymous        Do not send platform info to the server.
+                     [env: HIDE]
+                     
   --nickname=<name>  Use a nickname. [env: NICKNAME]
   --verbose          Be more verbose. [env: VERBOSE]
 ```
 
 #### ENV:
 
-| ENV      | Default                  | Document                                                     |
-| -------- | ------------------------ | ------------------------------------------------------------ |
-| URL      | `wss://cluster.vtbs.moe` | Upstream URL                                                 |
-| INTERVAL | `480`                    | Task interval in ms                                          |
-| HIDE     | `false` *                | hide all extra information including platform, client version, Node.js runtime version, docker status ** |
-| NICKNAME | `undefined`              | A optional nickname to display on statistics board (in progress). |
-| Docker   | Depends                  | Is Docker environment?                                       |
-| VERBOSE  | `false` *                | Verbose log                                                  |
+| ENV          | Default                  | Document                                                     |
+| ------------ | ------------------------ | ------------------------------------------------------------ |
+| URL          | `wss://cluster.vtbs.moe` | Upstream URL                                                 |
+| INTERVAL     | `1280`                   | Task interval in ms                                          |
+| LIMIT        | `Infinity`               | Live room relay WebSocket connections                        |
+| UUID         | `undefined`              | stats tracking                                               |
+| NO_DNS_CACHE | `false` *                | Disable internal DNS cache                                   |
+| HIDE         | `false` *                | hide all extra information including platform, client version, Node.js runtime version, docker status ** |
+| NICKNAME     | `undefined`              | A optional nickname to display on statistics board (in progress). |
+| Docker       | Depends                  | Is Docker environment?                                       |
+| VERBOSE      | `false` *                | Verbose log                                                  |
 
 \* giving any value will make it `true`
 
