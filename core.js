@@ -8,11 +8,6 @@ const relay = require('./relay')
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-const dnsLookupCache = new CacheableLookup({
-  maxTtl: 60,
-  cache: new QuickLRU({ maxSize: 1000 })
-})
-
 const parse = string => {
   if (string === 'wait') {
     return { empty: true }
@@ -31,6 +26,10 @@ class DDAtHome extends EventEmitter {
     this.wsLimit = wsLimit
     this.relay = relay(this)
     this.dnsCache = dnsCache
+    this.dnsLookupCache = new CacheableLookup({
+      maxTtl: 60,
+      cache: new QuickLRU({ maxSize: 1000 })
+    })
     if (start) {
       this.start()
     }
@@ -47,7 +46,7 @@ class DDAtHome extends EventEmitter {
         const time = Date.now()
         const opts = { headers: { Cookie: '_uuid=;rpdid=' } }
         if (this.dnsCache) {
-          opts.dnsCache = dnsLookupCache
+          opts.dnsCache = this.dnsLookupCache
         }
         const { body: data } = await got(url, opts).catch(async e => ({ body: JSON.stringify({ code: e.response.statusCode }) })).catch(() => ({ body: JSON.stringify({ code: 233 }) }))
         const result = this.secureSend(JSON.stringify({

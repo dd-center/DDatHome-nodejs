@@ -1,7 +1,13 @@
 const EventEmitter = require('events')
 
+const got = require('got')
 const { KeepLiveWS } = require('bilibili-live-ws')
-const { getConf: getConfW } = require('bilibili-live-ws/extra')
+
+const getConfW = async (roomid, opts) => {
+  const { data: { token: key, host_list: [{ host }] } } = await got(`https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${roomid}`, opts).json()
+  const address = `wss://${host}/sub`
+  return { key, host, address }
+}
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -45,7 +51,11 @@ module.exports = (home) => {
   }
 
   const getConf = roomid => {
-    const p = new Promise(resolve => waiting.push({ resolve, f: () => getConfW(roomid), roomid }))
+    const opts = {}
+    if (home.dnsCache) {
+      opts.dnsCache = home.dnsLookupCache
+    }
+    const p = new Promise(resolve => waiting.push({ resolve, f: () => getConfW(roomid, opts), roomid }))
     if (waiting.length === 1) {
       processWaiting()
     }
