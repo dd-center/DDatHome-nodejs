@@ -83,7 +83,7 @@ module.exports = (home) => {
       lived.delete(roomid)
       printStatus()
       const { address, key } = await getConf(roomid)
-      live.params[1] = { key, address }
+      live.params[2] = { key, address }
     })
 
     live.on('LIVE', () => send({ roomid, e: 'LIVE' }))
