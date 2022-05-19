@@ -105,7 +105,7 @@ Edit Settings by environment variables or by command line arguments.
 | NO_DNS_CACHE | `false` *                | Disable internal DNS cache                                   |
 | HIDE         | `false` *                | hide all extra information including platform, client version, Node.js runtime version, docker status ** |
 | NICKNAME     | `undefined`              | A optional nickname to display on statistics board (in progress). |
-| Docker       | Depends                  | Is Docker environment?                                       |
+| docker       | Depends                  | Is Docker environment?                                       |
 | VERBOSE      | `false` *                | Verbose log                                                  |
 
 \* giving any value will make it `true`
