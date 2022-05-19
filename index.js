@@ -17,8 +17,11 @@ Options:
   --interval=<time>  Interval to pull tasks (ms).
                      [env: INTERVAL] [default: 1280]
 
-  --ws-limit=<limit> Limit of WebSocket connections to live.bilibili.com
+  --ws-limit=<limit> Limit of WebSocket connections to live.bilibili.com.
                      [env: LIMIT]
+
+  --uuid=<uuid>      UUID for stats tracking.
+                     [env: UUID]
                      
   --no-dns-cache     Disable DNS cache
                      [env: NO_DNS_CACHE]
@@ -40,6 +43,7 @@ start({
   anonymous: args['--anonymous'],
   nickname: args['--nickname'],
   limit: args['--ws-limit'],
+  uuid: args['--uuid'],
   noDnsCache: args['--no-dns-cache'],
   verbose: process.env.development || args['--verbose']
 })
@@ -50,6 +54,7 @@ function start({
   anonymous = false,
   nickname,
   limit = Infinity,
+  uuid,
   noDnsCache = false,
   verbose = false
 }) {
@@ -76,6 +81,9 @@ function start({
     url.searchParams.set('platform', process.platform)
     if (process.env.docker) {
       url.searchParams.set('docker', 'docker')
+    }
+    if (uuid) {
+      url.searchParams.set('uuid', uuid)
     }
   }
 
