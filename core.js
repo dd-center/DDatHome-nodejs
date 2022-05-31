@@ -1,8 +1,5 @@
 const WebSocket = require('ws')
-const got = require('got')
 const EventEmitter = require('events')
-const CacheableLookup = require('cacheable-lookup')
-const QuickLRU = require('quick-lru')
 
 const relay = require('./relay')
 
@@ -16,7 +13,7 @@ const parse = string => {
 }
 
 class DDAtHome extends EventEmitter {
-  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity, dnsCache = true } = {}) {
+  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity } = {}) {
     super()
     this.url = url
     this.PING_INTERVAL = PING_INTERVAL
@@ -25,11 +22,6 @@ class DDAtHome extends EventEmitter {
     this.queryTable = new Map()
     this.wsLimit = wsLimit
     this.relay = relay(this)
-    this.dnsCache = dnsCache
-    this.dnsLookupCache = new CacheableLookup({
-      maxTtl: 60,
-      cache: new QuickLRU({ maxSize: 1000 })
-    })
     if (start) {
       this.start()
     }
@@ -45,10 +37,7 @@ class DDAtHome extends EventEmitter {
         this.emit('url', url)
         const time = Date.now()
         const opts = { headers: { Cookie: '_uuid=;rpdid=' } }
-        if (this.dnsCache) {
-          opts.dnsCache = this.dnsLookupCache
-        }
-        const { body: data } = await got(url, opts).catch(async e => ({ body: JSON.stringify({ code: e.response.statusCode }) })).catch(() => ({ body: JSON.stringify({ code: 233 }) }))
+        const data = await fetch(url, opts).then(w => w.text()).catch(() => JSON.stringify({ code: 233 }))
         const result = this.secureSend(JSON.stringify({
           key,
           data

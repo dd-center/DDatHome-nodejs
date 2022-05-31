@@ -23,9 +23,6 @@ Options:
   --uuid=<uuid>      UUID for stats tracking.
                      [env: UUID]
                      
-  --no-dns-cache     Disable DNS cache
-                     [env: NO_DNS_CACHE]
-                     
   --anonymous        Do not send platform info to the server.
                      [env: HIDE]
                      
@@ -44,7 +41,6 @@ start({
   nickname: args['--nickname'],
   limit: args['--ws-limit'],
   uuid: args['--uuid'],
-  noDnsCache: args['--no-dns-cache'],
   verbose: process.env.development || args['--verbose']
 })
 
@@ -55,7 +51,6 @@ function start({
   nickname,
   limit = Infinity,
   uuid,
-  noDnsCache = false,
   verbose = false
 }) {
   console.log(welcome() + '\n')
@@ -94,12 +89,11 @@ function start({
   console.log({
     INTERVAL: interval,
     limit,
-    noDnsCache,
     verbose
   })
   console.log(`using: ${url}\n`)
 
-  const ws = new DDAtHome(url, { INTERVAL: interval, wsLimit: limit, dnsCache: !noDnsCache })
+  const ws = new DDAtHome(url, { INTERVAL: interval, wsLimit: limit })
 
   if (verbose) {
     ws.on('log', console.log)

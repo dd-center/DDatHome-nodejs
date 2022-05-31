@@ -84,9 +84,6 @@ Edit Settings by environment variables or by command line arguments.
   --uuid=<uuid>      UUID for stats tracking.
                      [env: UUID]
                      
-  --no-dns-cache     Disable DNS cache
-                     [env: NO_DNS_CACHE]
-                     
   --anonymous        Do not send platform info to the server.
                      [env: HIDE]
                      
@@ -96,17 +93,16 @@ Edit Settings by environment variables or by command line arguments.
 
 #### ENV:
 
-| ENV          | Default                  | Document                                                     |
-| ------------ | ------------------------ | ------------------------------------------------------------ |
-| URL          | `wss://cluster.vtbs.moe` | Upstream URL                                                 |
-| INTERVAL     | `1280`                   | Task interval in ms                                          |
-| LIMIT        | `Infinity`               | Live room relay WebSocket connections                        |
-| UUID         | `undefined`              | stats tracking                                               |
-| NO_DNS_CACHE | `false` *                | Disable internal DNS cache                                   |
-| HIDE         | `false` *                | hide all extra information including platform, client version, Node.js runtime version, docker status ** |
-| NICKNAME     | `undefined`              | A optional nickname to display on statistics board (in progress). |
-| docker       | Depends                  | Is Docker environment?                                       |
-| VERBOSE      | `false` *                | Verbose log                                                  |
+| ENV      | Default                  | Document                                                     |
+| -------- | ------------------------ | ------------------------------------------------------------ |
+| URL      | `wss://cluster.vtbs.moe` | Upstream URL                                                 |
+| INTERVAL | `1280`                   | Task interval in ms                                          |
+| LIMIT    | `Infinity`               | Live room relay WebSocket connections                        |
+| UUID     | `undefined`              | stats tracking                                               |
+| HIDE     | `false` *                | hide all extra information including platform, client version, Node.js runtime version, docker status ** |
+| NICKNAME | `undefined`              | A optional nickname to display on statistics board (in progress). |
+| docker   | Depends                  | Is Docker environment?                                       |
+| VERBOSE  | `false` *                | Verbose log                                                  |
 
 \* giving any value will make it `true`
 
@@ -115,3 +111,16 @@ Edit Settings by environment variables or by command line arguments.
 ## Contribution/Other information
 
 The source code of backend (Cluster Manager) is available at <https://github.com/dd-center/Cluster-center>
+
+
+
+### Note
+
+
+
+1.11.0 use `fetch`, Node 18, remove DNS cache.
+
+
+
+Use 1.10.0 if you need. tag `v1.10.0` commit `d0b2b7ec55fd393186c33f8deb2b1cf28cba55c7`
+
