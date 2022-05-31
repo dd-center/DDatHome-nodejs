@@ -9,6 +9,9 @@
   },
   "main": "core.js",
   "bin": "index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "bilibili-live-ws": "^6.2.0",
     "cacheable-lookup": "^6.0.4",
