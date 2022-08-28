@@ -36,11 +36,11 @@ if (process.env.development) {
 
 start({
   url: process.env.development ? 'ws://0.0.0.0:9013' : args['--url'],
-  interval: args['--interval'],
-  anonymous: args['--anonymous'],
-  nickname: args['--nickname'],
-  limit: args['--ws-limit'],
-  uuid: args['--uuid'],
+  interval: args['--interval'] ?? process.env.DD_INTERVAL,
+  anonymous: args['--anonymous'] ?? process.env.DD_ANONYMOUS,
+  nickname: args['--nickname'] ?? process.env.DD_NICKNAME,
+  limit: args['--ws-limit'] ?? process.env.DD_WS_LIMIT,
+  uuid: args['--uuid'] ?? process.env.DD_UUID,
   verbose: process.env.development || args['--verbose']
 })
 
