@@ -3,7 +3,8 @@ const EventEmitter = require('events')
 const { KeepLiveWS } = require('bilibili-live-ws')
 
 const getConfW = async roomid => {
-  const { token: key, host_list: [{ host }] } = await fetch(`https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${roomid}`).then(w => w.json())
+  const { data: { token: key, host_list: hosts } } = await fetch(`https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${roomid}`).then(w => w.json())
+  const { host } = hosts[Math.floor(Math.random() * hosts.length)]
   const address = `wss://${host}/sub`
   return { key, host, address }
 }
