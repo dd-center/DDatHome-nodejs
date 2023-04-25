@@ -12,6 +12,19 @@ const parse = string => {
   return JSON.parse(string)
 }
 
+const parseBSON = data => {
+  const chunks = data.split('}{"code":')
+  if (chunks.length === 1) {
+    return data
+  }
+  return chunks.map((chunk, index) => {
+    if (index === 0) {
+      return chunk + '}'
+    }
+    return '{"code":' + chunk
+  })[1]
+}
+
 class DDAtHome extends EventEmitter {
   constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity } = {}) {
     super()
@@ -37,7 +50,13 @@ class DDAtHome extends EventEmitter {
         this.emit('url', url)
         const time = Date.now()
         const opts = { headers: { Cookie: '_uuid=;rpdid=', 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 15_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/105.0.5195.100 Mobile/15E148 Safari/604.1' } }
-        const data = await fetch(url, opts).then(w => w.text()).catch(() => JSON.stringify({ code: 233 }))
+        const dataRaw = await fetch(url, opts).then(w => w.text()).catch(() => JSON.stringify({ code: 233 }))
+        const data = parseBSON(dataRaw)
+        console.log(dataRaw)
+        if (data !== dataRaw) {
+          const diff = dataRaw.length - data.length
+          this.emit('log', 'BSON', diff)
+        }
         const result = this.secureSend(JSON.stringify({
           key,
           data
