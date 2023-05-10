@@ -13,7 +13,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "bilibili-live-ws": "^6.2.1",
+    "bilibili-live-ws": "^6.2.2",
     "neodoc": "^2.0.2",
     "undici": "^5.22.0",
     "ws": "^8.13.0"
