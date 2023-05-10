@@ -1,5 +1,6 @@
 const WebSocket = require('ws')
 const EventEmitter = require('events')
+const { Agent } = require('undici')
 
 const relay = require('./relay')
 
@@ -13,7 +14,7 @@ const parse = string => {
 }
 
 class DDAtHome extends EventEmitter {
-  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity } = {}) {
+  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity, genIP = () => undefined } = {}) {
     super()
     this.url = url
     this.PING_INTERVAL = PING_INTERVAL
@@ -22,6 +23,7 @@ class DDAtHome extends EventEmitter {
     this.queryTable = new Map()
     this.wsLimit = wsLimit
     this.relay = relay(this)
+    this.genIP = genIP
     if (start) {
       this.start()
     }
@@ -36,7 +38,10 @@ class DDAtHome extends EventEmitter {
         this.emit('log', 'job received', url)
         this.emit('url', url)
         const time = Date.now()
-        const opts = { headers: { Cookie: '_uuid=;rpdid=', 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 15_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/105.0.5195.100 Mobile/15E148 Safari/604.1' } }
+        const opts = {
+          dispatcher: new Agent({ localAddress: this.genIP() }),
+          headers: { Cookie: '_uuid=;rpdid=', 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 15_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/105.0.5195.100 Mobile/15E148 Safari/604.1' }
+        }
         const data = await fetch(url, opts).then(w => w.text()).catch(() => JSON.stringify({ code: 233 }))
         const result = this.secureSend(JSON.stringify({
           key,
