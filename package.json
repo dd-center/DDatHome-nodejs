@@ -15,7 +15,7 @@
   "dependencies": {
     "bilibili-live-ws": "^6.2.1",
     "neodoc": "^2.0.2",
-    "undici": "^5.22.0",
+    "undici": "^5.22.1",
     "ws": "^8.13.0"
   },
   "devDependencies": {
