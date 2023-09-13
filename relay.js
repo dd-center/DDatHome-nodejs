@@ -2,8 +2,8 @@ const EventEmitter = require('events')
 
 const { KeepLiveWS } = require('bilibili-live-ws')
 
-const getConfW = async roomid => {
-  const { data: { token: key, host_list: hosts } } = await fetch(`https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${roomid}`).then(w => w.json())
+const getConfW = async (roomid, customFetch) => {
+  const { data: { token: key, host_list: hosts } } = await customFetch(`https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${roomid}`).then(w => w.json())
   const { host } = hosts[Math.floor(Math.random() * hosts.length)]
   const address = `wss://${host}/sub`
   return { key, host, address }
@@ -11,7 +11,7 @@ const getConfW = async roomid => {
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-module.exports = (home) => {
+module.exports = (home, customFetch) => {
   const emitter = new EventEmitter().setMaxListeners(Infinity)
 
   let start = false
@@ -51,7 +51,7 @@ module.exports = (home) => {
   }
 
   const getConf = roomid => {
-    const p = new Promise(resolve => waiting.push({ resolve, f: () => getConfW(roomid), roomid }))
+    const p = new Promise(resolve => waiting.push({ resolve, f: () => getConfW(roomid, customFetch), roomid }))
     if (waiting.length === 1) {
       processWaiting()
     }
