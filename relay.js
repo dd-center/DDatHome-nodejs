@@ -11,7 +11,7 @@ const getConfW = async (roomid, customFetch) => {
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-module.exports = (home, customFetch) => {
+module.exports = (home, customFetch, getBUVID) => {
   const emitter = new EventEmitter().setMaxListeners(Infinity)
 
   let start = false
@@ -38,7 +38,6 @@ module.exports = (home, customFetch) => {
 
   const processWaiting = async () => {
     while (waiting.length) {
-      await wait(1800)
       const { f, resolve, roomid } = waiting.shift()
       f().then(resolve).catch(() => {
         log('redo', roomid)
@@ -47,6 +46,7 @@ module.exports = (home, customFetch) => {
           processWaiting()
         }
       })
+      await wait(1800)
     }
   }
 
@@ -62,7 +62,11 @@ module.exports = (home, customFetch) => {
     const { address, key } = await getConf(roomid)
     log(`OPEN: ${roomid}`)
     printStatus()
-    const live = new KeepLiveWS(roomid, { address, key })
+    const opts = { address, key, protover: 3 }
+    if (getBUVID) {
+      opts.buvid = await getBUVID()
+    }
+    const live = new KeepLiveWS(roomid, opts)
     live.interval = 60 * 1000
     live.on('live', () => {
       log(`LIVE: ${roomid}`)

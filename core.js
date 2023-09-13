@@ -12,7 +12,7 @@ const parse = string => {
 }
 
 class DDAtHome extends EventEmitter {
-  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity, genIP, WebSocket = require('ws'), customFetch } = {}) {
+  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity, genIP, WebSocket = require('ws'), customFetch, getBUVID } = {}) {
     super()
     this.url = url
     this.PING_INTERVAL = PING_INTERVAL
@@ -21,7 +21,7 @@ class DDAtHome extends EventEmitter {
     this.queryTable = new Map()
     this.wsLimit = wsLimit
     this.customFetch = customFetch || fetch
-    this.relay = relay(this, this.customFetch)
+    this.relay = relay(this, this.customFetch, getBUVID)
     this.genIP = genIP
     this.WebSocket = WebSocket
     if (start) {
