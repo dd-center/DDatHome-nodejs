@@ -12,7 +12,7 @@ const parse = string => {
 }
 
 class DDAtHome extends EventEmitter {
-  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity, genIP, WebSocket = require('ws'), customFetch, getBUVID } = {}) {
+  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity, dispatcher, WebSocket = require('ws'), customFetch, getBUVID } = {}) {
     super()
     this.url = url
     this.PING_INTERVAL = PING_INTERVAL
@@ -22,7 +22,7 @@ class DDAtHome extends EventEmitter {
     this.wsLimit = wsLimit
     this.customFetch = customFetch || fetch
     this.relay = relay(this, this.customFetch, getBUVID)
-    this.genIP = genIP
+    this.dispatcher = dispatcher
     this.WebSocket = WebSocket
     if (start) {
       this.start()
@@ -41,9 +41,8 @@ class DDAtHome extends EventEmitter {
         const opts = {
           headers: { Cookie: '_uuid=;rpdid=', 'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 15_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/105.0.5195.100 Mobile/15E148 Safari/604.1' }
         }
-        if (this.genIP) {
-          const { Agent } = require('undici')
-          opts.dispatcher = new Agent({ localAddress: this.genIP() })
+        if (this.dispatcher) {
+          opts.dispatcher = dispatcher
         }
         const data = await this.customFetch(url, opts).then(w => w.text()).catch(() => JSON.stringify({ code: 233 }))
         const result = this.secureSend(JSON.stringify({
