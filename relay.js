@@ -160,7 +160,7 @@ module.exports = (home, customFetch, getBUVID, uid) => {
             console.error('ask pickRoom error', e)
           })
       }
-    }, 5 * 1000)
+    }, home.liveInterval)
   })
 
   return emitter
