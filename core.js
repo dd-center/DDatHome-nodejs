@@ -12,7 +12,7 @@ const parse = string => {
 }
 
 class DDAtHome extends EventEmitter {
-  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity, dispatcher, WebSocket = require('ws'), customFetch, getBUVID } = {}) {
+  constructor(url, { PING_INTERVAL = 1000 * 30, INTERVAL = 480, start = true, wsLimit = Infinity, dispatcher, WebSocket = require('ws'), customFetch, getBUVID, uid = 0 } = {}) {
     super()
     this.url = url
     this.PING_INTERVAL = PING_INTERVAL
@@ -21,7 +21,7 @@ class DDAtHome extends EventEmitter {
     this.queryTable = new Map()
     this.wsLimit = wsLimit
     this.customFetch = customFetch || fetch
-    this.relay = relay(this, this.customFetch, getBUVID)
+    this.relay = relay(this, this.customFetch, getBUVID, uid)
     this.dispatcher = dispatcher
     this.WebSocket = WebSocket
     if (start) {
@@ -55,13 +55,13 @@ class DDAtHome extends EventEmitter {
         }
       }
 
-      ws.on('message', message => {
+      ws.onmessage = ({ data: message }) => {
         const { key, data, empty, payload } = parse(message)
         if (payload) {
           this.emit('payload', payload)
         }
         if (empty) {
-          this.emit('log', 'wait')
+          this.emit('wait')
         } else if (data) {
           const { type, url, result } = data
           if (type === 'query') {
@@ -73,7 +73,7 @@ class DDAtHome extends EventEmitter {
             processer({ key, url })
           }
         }
-      })
+      }
 
       const core = async () => {
         while (ws.readyState === 1) {
@@ -82,37 +82,41 @@ class DDAtHome extends EventEmitter {
         }
       }
 
-      ws.on('open', async () => {
+      ws.onopen = async () => {
         this.emit('log', 'DD@Home connected')
         this.emit('open')
         core()
 
         let lastPong = Date.now()
 
-        ws.on('pong', () => {
-          this.emit('log', 'pong')
-          lastPong = Date.now()
-        })
+        if (ws.on) {
+          ws.on('pong', () => {
+            this.emit('log', 'pong')
+            lastPong = Date.now()
+          })
+        }
 
-        while (ws.readyState === 1) {
-          ws.ping()
-          await wait(this.PING_INTERVAL)
-          if ((Date.now() - lastPong - this.PING_INTERVAL * 5) > 0) {
-            this.emit('log', 'timeout')
-            ws.close(4663, 'timeout')
+        if (ws.ping) {
+          while (ws.readyState === 1) {
+            ws.ping()
+            await wait(this.PING_INTERVAL)
+            if ((Date.now() - lastPong - this.PING_INTERVAL * 5) > 0) {
+              this.emit('log', 'timeout')
+              ws.close(4663, 'timeout')
+            }
           }
         }
-      })
+      }
 
-      ws.on('error', e => {
-        console.error(`error: ${e.message}`)
-      })
+      ws.onerror = e => {
+        console.error(`error: ${e.message || e}`)
+      }
 
-      ws.on('close', (n, reason) => {
-        this.emit('log', `closed ${n}`)
-        this.emit('close', n, reason)
+      ws.onclose = (n, reason) => {
+        this.emit('log', `closed ${n.code || n}`)
+        this.emit('close', n.code || n, reason || n.reason)
         setTimeout(resolve, 1000)
-      })
+      }
     })
   }
 

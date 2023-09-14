@@ -11,7 +11,7 @@ const getConfW = async (roomid, customFetch) => {
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-module.exports = (home, customFetch, getBUVID) => {
+module.exports = (home, customFetch, getBUVID, uid) => {
   const emitter = new EventEmitter().setMaxListeners(Infinity)
 
   let start = false
@@ -65,6 +65,9 @@ module.exports = (home, customFetch, getBUVID) => {
     const opts = { address, key, protover: 3 }
     if (getBUVID) {
       opts.buvid = await getBUVID()
+    }
+    if (uid) {
+      opts.uid = uid
     }
     const live = new KeepLiveWS(roomid, opts)
     live.interval = 60 * 1000
