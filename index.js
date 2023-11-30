@@ -73,7 +73,7 @@ function start({
   if (!anonymous) {
     url.searchParams.set('runtime', `node${process.version}`)
     url.searchParams.set('version', VERSION)
-    url.searchParams.set('platform', '${process.platform}-${process.arch}')
+    url.searchParams.set('platform', `${process.platform}-${process.arch}`)
     if (process.env.docker) {
       url.searchParams.set('docker', 'docker')
     }
